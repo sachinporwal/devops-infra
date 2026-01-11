@@ -25,8 +25,9 @@ module "ec2" {
 }
 
 module "alb" {
-  source      = "./modules/alb"
-  vpc_id      = module.vpc.vpc_id
-  subnet_id   = module.vpc.public_subnet_id
+  source     = "./modules/alb"
+  vpc_id     = module.vpc.vpc_id
+  subnet_ids = module.vpc.public_subnets
   instance_id = module.ec2.instance_id
 }
+

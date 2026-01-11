@@ -1,5 +1,7 @@
 variable "vpc_id" {}
-variable "subnet_id" {}
+variable "subnet_ids" {
+  type =  list(string)  
+}
 variable "instance_id" {}
 
 resource "aws_security_group" "alb_sg" {
@@ -24,7 +26,7 @@ resource "aws_security_group" "alb_sg" {
 resource "aws_lb" "this" {
   name               = "microservice-alb"
   load_balancer_type = "application"
-  subnets            = [var.subnet_id]
+  subnets            = [var.subnet_ids]
   security_groups    = [aws_security_group.alb_sg.id]
 }
 
