@@ -21,11 +21,17 @@ pipeline {
 
         stage("Configure Servers") {
             steps {
-                sh """
-                cd terraform
-                IP=$(terraform output -raw app_ip)
-                cd ../ansible
-                ansible-playbook -i "$IP," deploy.yml
+                script {
+                    def ip = sh(
+                        script: "cd terraform && terraform output -raw app_ip",
+                        returnStdout: true
+                    ).trim()
+
+                    sh """
+                    cd ansible
+                    ansible-playbook -i ${ip}, deploy.yml
+                    """
+                }
             }
         }
     }
