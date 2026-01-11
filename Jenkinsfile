@@ -29,7 +29,7 @@ pipeline {
 
                         sh """
                         cd ansible
-                        ansible-playbook -i ${ip}, deploy.yml
+                        ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i ${ip}, deploy.yml
                         """
                     }
                 }
