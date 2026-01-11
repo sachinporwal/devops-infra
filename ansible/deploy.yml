@@ -1,0 +1,25 @@
+- hosts: all
+  become: yes
+
+  tasks:
+    - name: Install Docker
+      apt:
+        name: docker.io
+        state: present
+        update_cache: yes
+
+    - name: Start Docker
+      service:
+        name: docker
+        state: started
+        enabled: true
+
+    - name: Run microservice
+      docker_container:
+        name: microservice
+        image: labdocker12/microservice:latest
+        state: started
+        ports:
+          - "80:5000"
+        pull:  yes
+
