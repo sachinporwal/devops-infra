@@ -19,7 +19,7 @@ module "vpc" {
 
 module "ec2" {
   source     = "./modules/ec2"
-  subnet_id  = module.vpc.public_subnet_id
+  subnet_id = module.vpc.public_subnets[0]
   jenkins_ip = "52.66.213.248"
   key_name   = "devops-key"
 }
@@ -27,7 +27,7 @@ module "ec2" {
 module "alb" {
   source     = "./modules/alb"
   vpc_id     = module.vpc.vpc_id
-  subnet_ids = module.vpc.public_subnets
+  subnet_id = module.vpc.public_subnets[0]
   instance_id = module.ec2.instance_id
 }
 

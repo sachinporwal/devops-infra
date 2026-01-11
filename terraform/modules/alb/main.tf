@@ -26,7 +26,7 @@ resource "aws_security_group" "alb_sg" {
 resource "aws_lb" "this" {
   name               = "microservice-alb"
   load_balancer_type = "application"
-  subnets            = [var.subnet_ids]
+  subnets            = var.subnet_ids
   security_groups    = [aws_security_group.alb_sg.id]
 }
 
