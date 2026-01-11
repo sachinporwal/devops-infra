@@ -16,10 +16,10 @@ pipeline {
         stage("Terraform Init") {
             steps {
                 withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-prod']]) {
-                    sh '''
-                        cd terraform
-                        terraform init
-                    '''
+                    sh """
+                    cd terraform
+                    terraform init -input=false
+                    """
                 }
             }
         }
@@ -27,10 +27,10 @@ pipeline {
         stage("Terraform Apply") {
             steps {
                 withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-prod']]) {
-                    sh '''
-                        cd terraform
-                        terraform apply -auto-approve
-                    '''
+                    sh """
+                    cd terraform
+                    terraform apply -auto-approve
+                    """
                 }
             }
         }
@@ -39,7 +39,11 @@ pipeline {
             steps {
                 withCredentials([
                     [$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-prod'],
-                    sshUserPrivateKey(credentialsId: 'ec2-ssh-key', keyFileVariable: 'SSH_KEY')
+                    sshUserPrivateKey(
+                        credentialsId: 'ec2-ssh',
+                        keyFileVariable: 'SSH_KEY',
+                        usernameVariable: 'SSH_USER'
+                    )
                 ]) {
                     script {
                         def ip = sh(
@@ -50,10 +54,10 @@ pipeline {
                         sh """
                         cd ansible
                         ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook \
-                          -i ${ip}, \
-                          --user ec2-user \
-                          --private-key \$SSH_KEY \
-                          deploy.yml
+                        -i ${ip}, \
+                        --user ${SSH_USER} \
+                        --private-key ${SSH_KEY} \
+                        deploy.yml
                         """
                     }
                 }
@@ -63,7 +67,7 @@ pipeline {
 
     post {
         success {
-            echo "Infrastructure and application deployed successfully"
+            echo "Infrastructure deployed and application configured successfully"
         }
         failure {
             echo "Pipeline failed. Check Terraform or Ansible logs"
